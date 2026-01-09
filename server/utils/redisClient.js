@@ -1,23 +1,29 @@
 const Redis = require('ioredis');
 
-const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-
 let redis = null;
 let isConnected = false;
 
 function getRedis() {
   if (redis) return redis;
 
-  redis = new Redis(redisUrl, {
+  redis = new Redis({
+    host: process.env.REDIS_HOST,
+    port: Number(process.env.REDIS_PORT),
+    username: process.env.REDIS_USERNAME || 'default',
+    password: process.env.REDIS_PASSWORD,
+
     maxRetriesPerRequest: 5,
-    retryStrategy: (times) => {
+
+    retryStrategy(times) {
       if (times > 10) return null;
       return Math.min(times * 200, 3000);
     },
-    reconnectOnError: (err) => {
-      const targetErrors = ['READONLY', 'ECONNRESET', 'ETIMEDOUT'];
-      return targetErrors.some(e => err.message.includes(e));
+
+    reconnectOnError(err) {
+      const retryErrors = ['READONLY', 'ECONNRESET', 'ETIMEDOUT'];
+      return retryErrors.some(e => err.message.includes(e));
     },
+
     lazyConnect: true
   });
 
@@ -28,7 +34,7 @@ function getRedis() {
 
   redis.on('error', (err) => {
     isConnected = false;
-    console.error('[redis] connection error:', err.message);
+    console.error('[redis] error:', err.message);
   });
 
   redis.on('close', () => {
@@ -76,7 +82,7 @@ async function clearCache(pattern = '*') {
   if (!isConnected) return;
   try {
     const keys = await redis.keys(pattern);
-    if (keys.length > 0) {
+    if (keys.length) {
       await redis.del(...keys);
     }
   } catch (err) {
