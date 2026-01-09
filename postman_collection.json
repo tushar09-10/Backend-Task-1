@@ -1,0 +1,172 @@
+{
+    "info": {
+        "name": "Token Aggregation Dashboard",
+        "description": "API collection for the real-time token aggregation dashboard",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:3001",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Health Check",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/health",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "health"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Get Tokens (Default)",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/tokens",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "tokens"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Get Tokens - By Volume",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/tokens?sortBy=volume&timeFrame=24h&limit=20",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "tokens"
+                    ],
+                    "query": [
+                        {
+                            "key": "sortBy",
+                            "value": "volume"
+                        },
+                        {
+                            "key": "timeFrame",
+                            "value": "24h"
+                        },
+                        {
+                            "key": "limit",
+                            "value": "20"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Get Tokens - By Price Change",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/tokens?sortBy=priceChange&timeFrame=1h&limit=10",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "tokens"
+                    ],
+                    "query": [
+                        {
+                            "key": "sortBy",
+                            "value": "priceChange"
+                        },
+                        {
+                            "key": "timeFrame",
+                            "value": "1h"
+                        },
+                        {
+                            "key": "limit",
+                            "value": "10"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Get Tokens - By Market Cap",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/tokens?sortBy=marketCap&timeFrame=7d",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "tokens"
+                    ],
+                    "query": [
+                        {
+                            "key": "sortBy",
+                            "value": "marketCap"
+                        },
+                        {
+                            "key": "timeFrame",
+                            "value": "7d"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Get Tokens - With Cursor",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/tokens?limit=10&cursor=PASTE_TOKEN_ADDRESS_HERE",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "tokens"
+                    ],
+                    "query": [
+                        {
+                            "key": "limit",
+                            "value": "10"
+                        },
+                        {
+                            "key": "cursor",
+                            "value": "PASTE_TOKEN_ADDRESS_HERE"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        }
+    ]
+}
