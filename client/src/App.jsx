@@ -55,8 +55,7 @@ export default function App() {
       setTokens(prevTokens => {
         const tokenMap = new Map(prevTokens.map(t => [t.tokenAddress, t]));
 
-        for (const change of changes) {
-          const { token } = change;
+        for (const token of changes) {
           if (tokenMap.has(token.tokenAddress)) {
             tokenMap.set(token.tokenAddress, { ...tokenMap.get(token.tokenAddress), ...token });
             setFlashKey(token.tokenAddress);
