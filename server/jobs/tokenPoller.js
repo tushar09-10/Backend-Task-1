@@ -18,7 +18,7 @@ async function poll() {
 
     console.log(`[poller] refreshing data for ${clients} connected client(s)`);
 
-    const freshTokens = await aggregator.getTokens(true);
+    const freshTokens = await aggregator.getTokens(false);
 
     if (previousTokens.length > 0) {
       const changes = aggregator.detectSignificantChanges(
@@ -29,12 +29,14 @@ async function poll() {
       );
 
       if (changes.length > 0) {
+        console.log(`[poller] broadcasting ${changes.length} changed token(s)`);
         socketService.broadcastTokenUpdates(changes);
       }
+    } else {
+      // First poll - send full refresh
+      console.log('[poller] first poll, broadcasting full refresh');
+      socketService.broadcastFullRefresh(freshTokens);
     }
-
-    // Always broadcast updated token data
-    socketService.broadcastFullRefresh(freshTokens);
 
     previousTokens = freshTokens;
   } catch (err) {

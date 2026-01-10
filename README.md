@@ -150,29 +150,75 @@ cd server
 npm test
 ```
 
+
+
 ## Environment Variables
 
-See `.env.example` for all available options:
+### Server (`server/.env`)
 
+**Required:**
+- `PORT` - Server port (default: 3001)
+- `CLIENT_ORIGIN` - Frontend URL for CORS (e.g., `http://localhost:5173` for dev)
+
+**Optional:**
+- `REDIS_URL` - Redis connection string (gracefully degrades to in-memory cache)
+- `CACHE_TTL_SECONDS` - Cache duration (default: 15)
+- `POLL_INTERVAL_SECONDS` - Data refresh interval (default: 10)
+- `PRICE_CHANGE_THRESHOLD` - Alert threshold for price changes (default: 0.01)
+- `VOLUME_SPIKE_THRESHOLD` - Alert threshold for volume spikes (default: 1.2)
+
+### Client (`client/.env`)
+
+- `VITE_API_URL` - Backend API URL (leave empty for same-origin proxy in dev)
+- `VITE_SOCKET_URL` - WebSocket URL (leave empty for same-origin in dev)
+
+### Create Your Environment Files
+
+```bash
+# Server
+cd server
+cp .env.example .env
+# Edit .env and update CLIENT_ORIGIN to match your client URL
+
+# Client
+cd ../client
+cp .env.example .env
+# Edit .env and update VITE_API_URL for production deployment
 ```
-PORT=3001
-REDIS_URL=redis://localhost:6379
-CACHE_TTL_SECONDS=30
-POLL_INTERVAL_SECONDS=15
-PRICE_CHANGE_THRESHOLD=0.02
-VOLUME_SPIKE_THRESHOLD=1.5
-```
+
+## CORS Configuration
+
+The server uses a dynamic CORS configuration:
+- If `CLIENT_ORIGIN` is set in `.env`, only that origin is allowed
+- If not set, the requesting origin is reflected (development mode)
+- Credentials are enabled for cookie/auth support
+
+### Troubleshooting CORS Issues
+
+**Problem:** "CORS policy: The request client is not allowed"
+
+**Solutions:**
+1. Ensure `CLIENT_ORIGIN` in `server/.env` matches your client URL exactly
+2. For development, use `http://localhost:5173` (Vite's default port)
+3. For production, set it to your deployed frontend URL
+4. Restart the server after changing `.env`
+
+**Problem:** "Credential is not supported if the CORS header 'Access-Control-Allow-Origin' is '*'"
+
+**Solution:** This has been fixed - the server now uses dynamic origin instead of wildcard.
 
 ## Deployment
 
-### Backend (Railway / Render)
+### Backend (Railway)
 
 1. Create new project and connect Git repo
 2. Set root directory to `/server`
-3. Set environment variables
-4. Deploy
-
-For Redis, use Railway's Redis addon or external provider.
+3. Add Redis database (recommended for production)
+4. Set environment variables:
+   - `CLIENT_ORIGIN` - Your deployed frontend URL
+   - `REDIS_URL` - Auto-populated by Railway if using their Redis
+   - `NODE_ENV=production`
+5. Deploy
 
 ### Frontend (Vercel / Netlify)
 

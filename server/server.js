@@ -13,8 +13,12 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_ORIGIN || '*',
-    methods: ['GET', 'POST']
+    origin: (origin, callback) => {
+      const allowedOrigin = process.env.CLIENT_ORIGIN || origin || '*';
+      callback(null, allowedOrigin);
+    },
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 

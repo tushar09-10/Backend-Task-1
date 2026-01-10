@@ -121,7 +121,7 @@ function filterAndSort(tokens, { sortBy = 'volume24h', timeFrame = '24h', limit 
 
 function detectSignificantChanges(oldTokens, newTokens, priceThreshold = 0.02, volumeThreshold = 1.5) {
   const oldMap = new Map(oldTokens.map(t => [t.tokenAddress, t]));
-  const changes = [];
+  const changedTokens = [];
 
   for (const newToken of newTokens) {
     const oldToken = oldMap.get(newToken.tokenAddress);
@@ -135,25 +135,13 @@ function detectSignificantChanges(oldTokens, newTokens, priceThreshold = 0.02, v
       ? newToken.volume1h / oldToken.volume1h
       : 0;
 
-    if (priceDelta >= priceThreshold) {
-      changes.push({
-        type: 'price',
-        token: newToken,
-        delta: priceDelta,
-        direction: newToken.priceUsd > oldToken.priceUsd ? 'up' : 'down'
-      });
-    }
-
-    if (volumeRatio >= volumeThreshold) {
-      changes.push({
-        type: 'volume_spike',
-        token: newToken,
-        ratio: volumeRatio
-      });
+    // If either threshold is exceeded, include this token in the update
+    if (priceDelta >= priceThreshold || volumeRatio >= volumeThreshold) {
+      changedTokens.push(newToken);
     }
   }
 
-  return changes;
+  return changedTokens;
 }
 
 module.exports = {
