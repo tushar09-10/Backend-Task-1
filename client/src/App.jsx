@@ -5,6 +5,9 @@ import TokenTable from './components/TokenTable';
 import { fetchTokens } from './services/api';
 import { connect, onTokenUpdates, onConnectionChange, disconnect } from './services/socket';
 
+const RELOAD_ATTEMPTS_KEY = 'tokenReloadAttempts';
+const MAX_RELOAD_ATTEMPTS = 2;
+
 export default function App() {
   const [tokens, setTokens] = useState([]);
   const [sortBy, setSortBy] = useState('volume');
@@ -25,6 +28,12 @@ export default function App() {
 
       const result = await fetchTokens({ sortBy, timeFrame, limit: 20, cursor });
 
+      try {
+        sessionStorage.removeItem(RELOAD_ATTEMPTS_KEY);
+      } catch (storageErr) {
+        console.warn('[app] failed to reset reload attempts:', storageErr);
+      }
+
       if (append) {
         setTokens(prev => [...prev, ...result.data]);
       } else {
@@ -34,6 +43,19 @@ export default function App() {
       setNextCursor(result.pagination.nextCursor);
     } catch (err) {
       console.error('[app] failed to load tokens:', err);
+
+      try {
+        const currentAttempts = parseInt(sessionStorage.getItem(RELOAD_ATTEMPTS_KEY) || '0', 10);
+
+        if (currentAttempts < MAX_RELOAD_ATTEMPTS) {
+          sessionStorage.setItem(RELOAD_ATTEMPTS_KEY, String(currentAttempts + 1));
+          window.location.reload();
+          return;
+        }
+      } catch (storageErr) {
+        console.warn('[app] failed to handle reload attempts:', storageErr);
+      }
+
       setError('Failed to load tokens');
     } finally {
       setIsLoading(false);
